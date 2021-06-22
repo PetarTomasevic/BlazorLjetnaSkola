@@ -1,0 +1,47 @@
+﻿@page "/todo"
+
+<h3>Todo</h3>
+
+<ul class="nav flex-column">
+
+    <li class="nav-item px-3">
+        <NavLink class="nav-link" href="todo">
+            <span class="oi oi-list-rich" aria-hidden="true"></span> TodoApp
+        </NavLink>
+    </li>
+
+    @if (todoList.Count > 0)
+    {
+        <ul>
+            @foreach (TodoItem todo in todoList)
+            {
+                @*<li>@todo.Title</li>*@
+                <li>
+                    <input type="checkbox" @bind="todo.IsComplete" />
+
+                    <span style="@(todo.IsComplete ? "text-decoration: line-through" : "")">@todo.Title</span>
+                </li>
+            }
+        </ul>
+
+    }
+
+    <input @bind="newTodoItem" placeholder="Enter a Todo" type="text">
+    <button @onclick="Save">Save</button>
+</ul>
+
+@code {
+
+    private string newTodoItem { get; set; }
+    private List<TodoItem> todoList = new List<TodoItem>();
+
+    private void Save()
+    {
+        if (!string.IsNullOrEmpty(newTodoItem))
+        {
+            todoList.Add(new TodoItem(newTodoItem));
+            newTodoItem = string.Empty;
+        }
+    }
+
+}
