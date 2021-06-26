@@ -1,0 +1,51 @@
+﻿@page "/after-render"
+@using Microsoft.Extensions.Logging
+@inject ILogger<OnAfterRenderSample> Logger
+<h3>OnAfterRenderSample</h3>
+<p>@message</p>
+<button @onclick="LogInformation">Log information (and trigger a render)</button>
+
+<p>
+    OnAfterRender and OnAfterRenderAsync are called after a component has finished rendering. Element and component references are populated at this point. Use this stage to perform additional initialization steps with the rendered content, such as JS interop calls that interact with the rendered DOM elements.
+
+    The firstRender parameter for OnAfterRender and OnAfterRenderAsync:
+
+    Is set to true the first time that the component instance is rendered.
+    Can be used to ensure that initialization work is only performed once.
+</p>
+
+@code {
+    private string message = "Initial assigned message.";
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Logger.LogInformation("OnAfterRender(1): firstRender: " +
+            "{FirstRender}, message: {Message}", firstRender, message);
+
+        if (firstRender)
+        {
+            message = "Executed for the first render.";
+        }
+        else
+        {
+            message = "Executed after the first render.";
+        }
+
+        Logger.LogInformation("OnAfterRender(2): firstRender: " +
+            "{FirstRender}, message: {Message}", firstRender, message);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Logger.LogInformation("OnAfterRender(1): firstRender: " +
+           "{FirstRender}, message: {Message}", firstRender, message);
+        }
+    }
+
+    private void LogInformation()
+    {
+        Logger.LogInformation("LogInformation called");
+    }
+}

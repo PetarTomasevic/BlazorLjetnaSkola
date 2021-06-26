@@ -1,0 +1,18 @@
+﻿@page "/on-init"
+
+<p>@message</p>
+
+<p>
+    OnInitialized and OnInitializedAsync are invoked when the component is initialized after having received its initial parameters in SetParametersAsync.
+
+    For a synchronous operation, override OnInitialized:
+</p>
+
+@code {
+    private string message;
+
+    protected override void OnInitialized()
+    {
+        message = $"Initialized at {DateTime.Now}";
+    }
+}

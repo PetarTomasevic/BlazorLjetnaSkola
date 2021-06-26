@@ -1,0 +1,42 @@
+﻿@page "/set-params-async/{Param?}"
+
+<p>@message</p>
+
+<p>
+    SetParametersAsync sets parameters supplied by the component's parent in the render tree or from route parameters.
+
+    The method's ParameterView parameter contains the set of component parameter values for the component each time SetParametersAsync is called. By overriding the SetParametersAsync method, developer code can interact directly with ParameterView's parameters.
+
+    The default implementation of SetParametersAsync sets the value of each property with the [Parameter] or [CascadingParameter] attribute that has a corresponding value in the ParameterView. Parameters that don't have a corresponding value in ParameterView are left unchanged.
+
+    If base.SetParametersAsync isn't invoked, developer code can interpret the incoming parameters' values in any way required. For example, there's no requirement to assign the incoming parameters to the properties of the class.
+
+    If event handlers are provided in developer code, unhook them on disposal. For more information, see the Component disposal with IDisposable section.
+
+    In the following example, ParameterView.TryGetValue assigns the Param parameter's value to value if parsing a route parameter for Param is successful. When value isn't null, the value is displayed by the component.
+
+    Although route parameter matching is case insensitive, TryGetValue only matches case sensitive parameter names in the route template. The following example requires the use of /{Param?} in the route template in order to get the value with TryGetValue, not /{param?}. If /{param?} is used in this scenario, TryGetValue returns false and message isn't set to either message string.
+</p>
+@code {
+    private string message = "Not set";
+
+    [Parameter]
+    public string Param { get; set; }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.TryGetValue<string>(nameof(Param), out var value))
+        {
+            if (value is null)
+            {
+                message = "The value of 'Param' is null.";
+            }
+            else
+            {
+                message = $"The value of 'Param' is {value}.";
+            }
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
+}
