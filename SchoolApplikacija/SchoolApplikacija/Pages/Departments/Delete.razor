@@ -1,0 +1,57 @@
+﻿@page "/departments/delete/{DepartmentID}"
+@inject IDepartmentServices departmentsService
+@inject IInstructorsServices instructorsService
+@inject NavigationManager NavigationManager
+
+<h3>Delete</h3>
+
+<div>
+    @if (IsBusy)
+    {
+<p>Loading....</p> }
+else
+{
+<h3>Are you sure zou want to delete this?</h3>
+                <div>
+                    <h4>Departments</h4>
+                    <hr />
+                    <dl class="row">
+                        <dt class="col-sm-2">Name</dt>
+                        <dd class="col-sm-10">@Department.Name</dd>
+                        <dt class="col-sm-2">Budget</dt>
+                        <dd class="col-sm-10">@Department.Budget</dd>
+                        <dt class="col-sm-2">Start Date</dt>
+                        <dd class="col-sm-10">@Department.StartDate</dd>
+                        <dt class="col-sm-2">Administrator</dt>
+                        <dd class="col-sm-10">@Department.AdministratorFullName</dd>
+                    </dl>
+                </div>
+                                <div>
+                                    <a class="btn btn-dark" href="/departments">Cancel</a>
+                                    <button class="btn btn-danger" @onclick="@OnDeleteClick">Delete</button>
+                                </div>}
+</div>
+@code { [Parameter] public string DepartmentID { get; set; }
+    public bool IsBusy { get; set; }
+
+    public DepartmentDto Department;
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsBusy = true;
+        await LoadDepartment(DepartmentID);
+        IsBusy = false;
+    }
+
+    public async Task LoadDepartment(string deptId)
+    {
+        Department = await departmentsService.GetByIDAsync(Convert.ToInt32(deptId));
+
+    }
+
+    public async Task OnDeleteClick()
+    {
+        var deleted = await departmentsService.DeleteDepartmentsAsync(Convert.ToInt32(DepartmentID));
+
+        NavigationManager.NavigateTo("/departments");
+    } }

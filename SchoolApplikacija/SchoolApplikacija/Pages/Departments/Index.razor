@@ -1,0 +1,61 @@
+﻿@page "/departments"
+@inject IDepartmentServices departmentsService
+
+<h3>Index</h3>
+
+<p>
+    <a href="/departments/create">Create New</a>
+</p>
+@if (IsBusy)
+{
+    <p>Loading....</p>
+}
+else
+{
+    <table class="table table-sm table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Name </th>
+                <th scope="col">Budget </th>
+                <th scope="col">Datetime </th>
+                <th scope="col">Admisitrator </th>
+                <th scope="col">Actions </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (DepartmentDto departments in Departments)
+            {
+                <tr>
+                    <td>@departments.Name</td>
+                    <td>@departments.Budget</td>
+                    <td>@departments.StartDate.ToString("dd.MM.yyyy")</td>
+                    <td>@departments.AdministratorFullName</td>
+                    <td>
+                        <ActionLinkButton Action="Details" Route="/departments" RouteValue="@departments.DepartmentID.ToString()"></ActionLinkButton>
+                        <ActionLinkButton Action="Edit" Route="/departments" RouteValue="@departments.DepartmentID.ToString()"></ActionLinkButton>
+                        <ActionLinkButton Action="Delete" Route="/departments" RouteValue="@departments.DepartmentID.ToString()"></ActionLinkButton>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+
+}
+@code {
+    public bool IsBusy { get; set; }
+    public bool disableValue { get; set; } = false;
+    public List<DepartmentDto> Departments;
+    protected override async Task OnInitializedAsync()
+    {
+        IsBusy = true;
+        await LoadDepartments();
+        IsBusy = false;
+
+    }
+
+    async Task LoadDepartments()
+    {
+        Departments = await departmentsService.GetListAsync();
+    }
+}

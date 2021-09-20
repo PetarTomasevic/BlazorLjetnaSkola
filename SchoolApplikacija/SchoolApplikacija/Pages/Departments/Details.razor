@@ -1,0 +1,52 @@
+﻿@page "/departments/details/{DeptID}"
+@inject IDepartmentServices departmentsService
+
+<div>
+    <h4>Department</h4>
+    <hr />
+
+    @if (IsBusy)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@Department.Name</dd>
+
+            <dt class="col-sm-2">Budget</dt>
+            <dd class="col-sm-10">@Department.Budget</dd>
+
+            <dt class="col-sm-2">Start Date</dt>
+            <dd class="col-sm-10">@Department.StartDate</dd>
+
+            <dt class="col-sm-2">Administrator</dt>
+            <dd class="col-sm-10">@Department.AdministratorFullName</dd>
+        </dl>
+
+        <div>
+            <a href="/departments/edit/@Department.DepartmentID">Edit</a>
+            <a href="/departments">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string DeptID { get; set; }
+    public bool IsBusy { get; set; }
+    public DepartmentDto Department;
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsBusy = true;
+        await LoadDepartment(DeptID);
+        IsBusy = false;
+    }
+
+    async Task LoadDepartment(string deptId)
+    {
+        Department = await departmentsService.GetByIDAsync(Convert.ToInt32(deptId));
+    }
+}

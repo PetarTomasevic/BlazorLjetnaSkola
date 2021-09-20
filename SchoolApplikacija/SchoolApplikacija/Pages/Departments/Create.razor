@@ -1,0 +1,117 @@
+﻿@page "/departments/create"
+
+@inject IDepartmentServices departmentsService
+@inject IInstructorsServices instructorsService
+@inject NavigationManager NavigationManager
+
+<h3>Create</h3>
+<h4>Department</h4>
+
+@if (IsBusy)
+{
+<p>Loading....</p> }
+else
+{
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="Name" class="control-label"><strong>Name</strong> </label>
+            <input type="text" id="Name" @bind="Department.Name" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="Budget" class="control-label"><b>Budget</b></label>
+            <input type="text" name="Budget" id="Budget" @bind="Department.Budget" class="form-control" />
+            <span class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="StartDate" class="control-label"><b>Start Date</b></label>
+            <div class="row">
+                <div class="col-sm-4">
+                    <select name="StartDate" id="HireDate" class="custom-select" @bind="StartDay">
+
+                        @for (var dayCounter = 1; dayCounter <= LastDayInMonth; dayCounter++)
+                        {
+        <option value="@dayCounter"> @dayCounter</option>}
+                    </select>
+                </div>
+                <div class="col-sm-4">
+                    <select class="custom-select" @bind="StartMonth">
+                        <option selected="">Month</option>
+                        <option value="1">Jan</option>
+                        <option value="2">Feb</option>
+                        <option value="3">Mar</option>
+                        <option value="4">Apr</option>
+                        <option value="5">May</option>
+                        <option value="6">Jun</option>
+                        <option value="7">Jul</option>
+                        <option value="8">Aug</option>
+                        <option value="9">Sep</option>
+                        <option value="10">Oct</option>
+                        <option value="11">Nov</option>
+                        <option value="12">Dec</option>
+                    </select>
+                </div>
+                <div class="col-sm-4">
+                    <select class="custom-select" @bind="StartYear">
+                        <option selected="">Year</option>
+                        @for (var counter = 2021; counter >= 1900; counter--)
+                        {
+        <option value="@counter">@counter</option>
+}
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Instructor" class="control-label"><b>Instructor</b></label>
+            <select class="custom-select" @bind="@Department.InstructorID">
+                <option selected="">-- Select Instructor --</option>
+                @foreach (var instructor in Instructors)
+                {
+<option value="@instructor.Id">@($"{instructor.FirstMidName} {instructor.LastName}")</option>
+}
+            </select>
+            <span class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <a class="btn btn-default" href="/departments">Cancel</a> <input type="button" value="Save" class="btn btn-primary" @onclick="@OnSaveClick" />
+                    </div>
+                </div>
+}
+
+@code { public bool IsBusy { get; set; } = false;
+    public List<InstructorDto> Instructors { get; set; }
+    public DepartmentDto Department { get; set; } = new DepartmentDto();
+
+    public int StartDay = DateTime.Today.Day;
+    public int StartMonth = DateTime.Today.Month;
+    public int StartYear = DateTime.Today.Year;
+    public int LastDayInMonth = DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month);
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsBusy = true;
+        await LoadInstructors();
+        IsBusy = false;
+    }
+
+    async Task LoadInstructors()
+    {
+        var instructorsTask = instructorsService.GetInstructorsAsync();
+        Instructors = await instructorsTask;
+    }
+
+    public async void OnSaveClick()
+    {
+        Department.StartDate = DateTime.Parse($"{StartYear}/{StartMonth}/{StartDay}");
+        var updated = await departmentsService.DepartmentAddAsync(Department);
+        NavigationManager.NavigateTo("/departments");
+    } }
